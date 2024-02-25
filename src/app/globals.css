@@ -24,10 +24,28 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  justify-content: center;
+  display: flex;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 100px;
+  max-height: 300px;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.2);
+  background: rgba(var(--foreground-rgb), 0.1);
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: border-color 0.2s ease;
 }
