@@ -36,8 +36,7 @@ body {
 
 textarea {
   resize: none;
-  overflow: hidden;
-  min-height: 100px;
+  min-height: 250px;
   max-height: 300px;
   width: 100%;
   padding: 0.5rem;
@@ -48,4 +47,17 @@ textarea {
   font-size: 1rem;
   line-height: 1.5;
   transition: border-color 0.2s ease;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+td {
+  border-top: 1px solid rgba(var(--foreground-rgb), 0.2);
+}
+
+td ul {
+  list-style-type: disc !important; /* 'important'를 사용해 우선순위를 높임 */
 }

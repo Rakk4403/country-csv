@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import countriesJson from "../res/countries.json";
+import { useSnackbar } from "./snackbar.client";
 
 type Country = {
   name: {
@@ -105,7 +106,10 @@ function CountrySelector({
               name.toLowerCase().indexOf(dupString) + dupString.length
             )}
           </span>
-          {name.substring(name.toLowerCase().indexOf(dupString) + dupString.length, name.length)}
+          {name.substring(
+            name.toLowerCase().indexOf(dupString) + dupString.length,
+            name.length
+          )}
         </>
       ) : (
         name
@@ -118,9 +122,11 @@ export default function CountryContinent() {
   const [inputCountries, setInputCountries] = useState<string[]>([]);
   const [metaData, setMetaData] = useState<any[]>([]);
   const [countryNameMap, setCountryNameMap] = useState<CountryNameMap>({});
-  const [nameToContienetMap, setNameToContienetMap] = useState<NameToContienetMap>({});
+  const [nameToContienetMap, setNameToContienetMap] =
+    useState<NameToContienetMap>({});
   const [data, setData] = useState<any[]>([]);
-  const outputRef = useRef<HTMLTextAreaElement>(null);
+  const outputRef = useRef(null);
+  const { show: showSnackbar } = useSnackbar();
 
   useEffect(() => {
     (async () => {
@@ -154,15 +160,20 @@ export default function CountryContinent() {
           input: country,
           exact: true,
           official: countryNameMap[partialName.toLowerCase()],
-          continents: nameToContienetMap[countryNameMap[partialName.toLowerCase()]],
+          continents:
+            nameToContienetMap[countryNameMap[partialName.toLowerCase()]],
         };
       }
       return {
         input: country,
         exact: false,
         names: partialNames,
-        official: partialNames.map((name) => countryNameMap[name.toLowerCase()]),
-        continents: partialNames.flatMap((name) => nameToContienetMap[countryNameMap[name.toLowerCase()]]),
+        official: partialNames.map(
+          (name) => countryNameMap[name.toLowerCase()]
+        ),
+        continents: partialNames.flatMap(
+          (name) => nameToContienetMap[countryNameMap[name.toLowerCase()]]
+        ),
       };
     });
 
@@ -187,7 +198,9 @@ export default function CountryContinent() {
     );
   }, [inputCountries]);
 
-  const handleChangeInputText = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChangeInputText = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const value = event.target.value;
     const lines = value
       .split("\n")
@@ -213,6 +226,7 @@ export default function CountryContinent() {
   };
 
   const handleCopy = async () => {
+    showSnackbar("Copied to clipboard");
     const text = outputRef.current?.value ?? "";
     await navigator.clipboard.writeText(text);
   };
@@ -227,118 +241,133 @@ export default function CountryContinent() {
     a.click();
   };
 
+  const handleChangeOutputText = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    e.target.style.height = "auto";
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  };
+
   const selectableData = data.filter((country) => !country.exact);
 
-  return (
-    <main>
-      <h1>Continent by country name</h1>
-      <p>
-        Enter country names and find their continents. If the country name is not found, select from the list of similar
-        names.
-      </p>
-      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-        <div>
-          <p>
-            Input) <br />
-            USA
-            <br />
-            south korea
-          </p>
-        </div>
-        ➡️
-        <div>
-          <p>
-            Output) <br />
-            USA, North America
-            <br />
-            south korea, Asia
-          </p>
-        </div>
-      </div>
-      <textarea style={{ width: "100%", border: "solid 1px #ddd", padding: 1 }} onChange={handleChangeInputText} />
-      {selectableData.length > 0 && (
-        <div className="transition-all ease-in-out duration-500">
-          <span>Selectable Inputs</span>
-          <table>
-            <thead>
-              <th>Typed</th>
-              <th>Countries</th>
-              <th>Continent</th>
-            </thead>
-            <tbody>
-              {data
-                .filter((country: InputLine) => !country.exact)
-                .map((country: InputLine) => (
-                  <tr key={country.input}>
-                    <td>{country.input}</td>
-                    <td>
-                      {country.exact ? (
-                        country.official
-                      ) : (
-                        <CountrySelector
-                          names={country.names}
-                          dupString={country.input}
-                          selectedIndex={country.selectedIndex}
-                          onSelect={(idx) => handleSelectCountry(country.input, idx)}
-                        />
-                      )}
-                    </td>
-                    <td>
-                      {country.continents.map((continent) => (
-                        <div>{continent}</div>
-                      ))}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      <div style={{ display: "flex", gap: 10 }}>
-        <span>Output</span>
-        <div className="flex" style={{ gap: 4 }}>
-          <span>
-            <input type="checkbox" />
-            Convert to Official Name
-          </span>
-          <button 
-            type="button" 
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
-            onClick={handleDownload}
-          >
-            DOWNLOAD
-          </button>
-          <button 
-            type="button" 
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
-            onClick={handleCopy}
-          >
-            COPY
-          </button>
-        </div>
-      </div>
-      <textarea
-        ref={outputRef}
-        readOnly
-        style={{
-          width: "100%",
-          height: `${data.length * 2}rem`,
-          border: "solid 1px #ddd",
-          padding: 1,
-        }}
-        value={data
-          .map((country: InputLine) => {
-            if (country.exact) {
-              return `${country.input},${country.continents[0]}`;
-            }
+  const outputValue = data
+    .map((country: InputLine) => {
+      if (country.exact) {
+        return `${country.input},${country.continents[0]}`;
+      }
 
-            if (country.selectedIndex == undefined) {
-              return `${country.input},"Not Found"`;
-            }
-            return `${country.input},${country.continents[country.selectedIndex]}`;
-          })
-          .join("\n")}
-      />
+      if (country.selectedIndex == undefined) {
+        return `${country.input},"Not Found"`;
+      }
+      return `${country.input},${country.continents[country.selectedIndex]}`;
+    })
+    .join("\n");
+
+  return (
+    <main className="flex flex-col gap-2.5">
+      <h1>Continent by Country name</h1>
+      <div className="flex flex-col gap-5">
+        <p>
+          Enter country names and find their continents. If the country name is
+          not found, select from the list of similar names.
+        </p>
+        <div>
+          <p>Example:</p>
+          <div className="flex gap-2.5 items-center">
+            <textarea
+              readOnly
+              value={"USA\nsouth Korea"}
+              className="resize-none"
+            />
+            ➡️
+            <textarea
+              readOnly
+              value={"USA, North America\nsouth korea, Asia"}
+              className="resize-none"
+            />
+          </div>
+        </div>
+        <div>
+          <p>Input:</p>
+          <textarea
+            className="w-full border border-gray-300 p-0.5"
+            style={{ overflowY: "auto" }}
+            onChange={handleChangeInputText}
+          />
+        </div>
+        {selectableData.length > 0 && (
+          <div className="transition-all ease-in-out duration-500">
+            <span>Errors:</span>
+            <table>
+              <colgroup>
+                <col style={{ width: 80 }} />
+                <col style={{ width: 200 }} />
+                <col style={{ width: 300 }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Line</th>
+                  <th>Typed</th>
+                  <th>Countries</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data
+                  .filter((country) => !country.exact)
+                  .map((country) => (
+                    <tr key={country.input}>
+                      <td>
+                        <div>Line {inputCountries.indexOf(country.input)}</div>
+                      </td>
+                      <td>{country.input}</td>
+                      <td>
+                        {country.names.length > 0
+                          ? "Alternatives:"
+                          : "Not Found!"}
+                        <ul>
+                          {country.names.map((name, idx) => (
+                            <li key={name}>{name}</li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2.5">
+            <span>Output</span>
+            <div className="flex gap-1">
+              <span>
+                <input type="checkbox" />
+                Convert to Official Name
+              </span>
+              <button
+                type="button"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleDownload}
+              >
+                DOWNLOAD
+              </button>
+              <button
+                type="button"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleCopy}
+              >
+                COPY
+              </button>
+            </div>
+          </div>
+          <textarea
+            ref={outputRef}
+            className={`w-full border border-gray-300 p-0.5`}
+            value={outputValue}
+            onChange={handleChangeOutputText}
+          />
+        </div>
+      </div>
     </main>
   );
 }
