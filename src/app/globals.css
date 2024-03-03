@@ -60,4 +60,5 @@ td {
 
 td ul {
   list-style-type: disc !important; /* 'important'를 사용해 우선순위를 높임 */
+  padding-left: 1.3rem;
 }

@@ -8,12 +8,6 @@ type Country = {
   name: {
     common: string;
     official: string;
-    // nativeName?: {
-    //   cat?: {
-    //     official?: string;
-    //     common?: string;
-    //   };
-    // };
   };
   continents: string[];
 };
@@ -126,7 +120,7 @@ export default function CountryContinent() {
     useState<NameToContienetMap>({});
   const [data, setData] = useState<any[]>([]);
   const outputRef = useRef(null);
-  const { show: showSnackbar } = useSnackbar();
+  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
     (async () => {
@@ -296,7 +290,7 @@ export default function CountryContinent() {
           />
         </div>
         {selectableData.length > 0 && (
-          <div className="transition-all ease-in-out duration-500">
+          <div className="transition-all ease-in-out duration-50 border-solid border-2 border-red-800 rounded">
             <span>Errors:</span>
             <table>
               <colgroup>
@@ -307,8 +301,8 @@ export default function CountryContinent() {
               <thead>
                 <tr>
                   <th>Line</th>
-                  <th>Typed</th>
-                  <th>Countries</th>
+                  <th>You typed</th>
+                  <th>Country Names</th>
                 </tr>
               </thead>
               <tbody>
@@ -340,20 +334,16 @@ export default function CountryContinent() {
           <div className="flex items-center gap-2.5">
             <span>Output</span>
             <div className="flex gap-1">
-              <span>
-                <input type="checkbox" />
-                Convert to Official Name
-              </span>
               <button
                 type="button"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
                 onClick={handleDownload}
               >
                 DOWNLOAD
               </button>
               <button
                 type="button"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
                 onClick={handleCopy}
               >
                 COPY
