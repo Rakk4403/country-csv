@@ -118,8 +118,8 @@ export default function CountryContinent() {
   const [countryNameMap, setCountryNameMap] = useState<CountryNameMap>({});
   const [nameToContienetMap, setNameToContienetMap] =
     useState<NameToContienetMap>({});
-  const [data, setData] = useState<any[]>([]);
-  const outputRef = useRef(null);
+  const [data, setData] = useState<InputLine[]>([]);
+  const outputRef = useRef<HTMLTextAreaElement>(null);
   const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -315,13 +315,15 @@ export default function CountryContinent() {
                       </td>
                       <td>{country.input}</td>
                       <td>
-                        {country.names.length > 0
+                        {(country as PartialInputLine).names.length > 0
                           ? "Alternatives:"
                           : "Not Found!"}
                         <ul>
-                          {country.names.map((name, idx) => (
-                            <li key={name}>{name}</li>
-                          ))}
+                          {(country as PartialInputLine).names.map(
+                            (name, idx) => (
+                              <li key={name}>{name}</li>
+                            )
+                          )}
                         </ul>
                       </td>
                     </tr>
