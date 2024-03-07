@@ -1,5 +1,3 @@
-"use client";
-
 import CountryContinent from "@/components/continent.client";
 import { SnackbarProvider } from "../components/snackbar.client";
 
